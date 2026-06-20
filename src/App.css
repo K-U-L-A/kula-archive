@@ -1,0 +1,82 @@
+.home {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  flex: 1;
+  padding: 48px;
+  box-sizing: border-box;
+  background: #ffffff;
+  overflow: visible;
+}
+
+.wordmark-stage {
+  position: relative;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.wordmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+  overflow: visible;
+}
+
+.pixel {
+  --depth: 3px;
+
+  position: absolute;
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  border: 2px solid #000000;
+  border-radius: 0;
+  background: #ffffff;
+  cursor: pointer;
+  appearance: none;
+  overflow: visible;
+  box-shadow: none;
+  transition: background-color 0.18s ease;
+}
+
+.pixel::before,
+.pixel::after {
+  content: '';
+  position: absolute;
+  box-sizing: border-box;
+  background: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 0;
+  box-shadow: none;
+  pointer-events: none;
+  transition: background-color 0.18s ease;
+}
+
+.pixel::before {
+  top: var(--depth);
+  left: 100%;
+  width: var(--depth);
+  height: calc(100% - var(--depth));
+  border-left: none;
+}
+
+.pixel::after {
+  top: 100%;
+  left: var(--depth);
+  width: calc(100% - var(--depth));
+  height: var(--depth);
+  border-top: none;
+}
+
+.pixel:hover {
+  background-color: #000000;
+  border-color: #000000;
+}
+
+.pixel:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+}

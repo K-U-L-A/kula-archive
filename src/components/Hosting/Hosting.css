@@ -1,0 +1,11 @@
+.hosting {
+  padding: var(--space-section) var(--space-page);
+}
+
+.hosting__inner {
+  max-width: var(--measure);
+}
+
+.hosting .section-label {
+  margin-bottom: calc(var(--space-block) * 1.1);
+}

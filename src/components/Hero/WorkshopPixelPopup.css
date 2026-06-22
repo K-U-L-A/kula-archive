@@ -1,0 +1,99 @@
+.pixel-popup {
+  position: fixed;
+  transform: translate(-50%, -50%) scale(0.94);
+  width: 210px;
+  background: #fff;
+  border: 1px solid #000;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  padding: 12px 12px 0px 12px;
+  box-sizing: border-box;
+}
+
+.pixel-popup--visible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.pixel-popup__close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: none;
+  border: none;
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  color: #000;
+  opacity: 0.2;
+  z-index: 1;
+  font-family: inherit;
+}
+
+.pixel-popup__close:hover {
+  opacity: 0.7;
+}
+
+.pixel-popup__img-col {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border: 1px solid #000;
+}
+
+.pixel-popup__img-col img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.pixel-popup__img-placeholder {
+  width: 100%;
+  height: 100%;
+  background: #f0f0f0;
+}
+
+.pixel-popup__text-col {
+  padding: 10px 0 14px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.pixel-popup__title {
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin: 0;
+  font-weight: 400;
+  line-height: 1.4;
+  font-family: inherit;
+}
+
+.pixel-popup__detail {
+  font-size: 10px;
+  opacity: 0.35;
+  margin: 0;
+  letter-spacing: 0.02em;
+  font-family: inherit;
+}
+
+.pixel-popup__empty-text {
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  margin: 0;
+  line-height: 1.5;
+  font-weight: 400;
+  font-family: inherit;
+}
+
+.pixel-popup__glyph {
+  font-family: 'Noto Sans Egyptian Hieroglyphs', 'Noto Sans', sans-serif;
+  font-size: 8px;
+  vertical-align: 3px;
+  display: inline-block;
+  letter-spacing: 0.5px;
+}

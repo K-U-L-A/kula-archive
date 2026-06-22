@@ -1,0 +1,116 @@
+.navigation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  height: var(--nav-height);
+  background: var(--color-bg);
+}
+
+.navigation__inner {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-page);
+}
+
+.navigation__list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px clamp(18px, 3vw, 36px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.navigation__link,
+.navigation__dropdown-link {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-fg);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  line-height: 1;
+  cursor: pointer;
+  text-decoration: none;
+  opacity: 0.72;
+  transition: opacity 0.2s ease;
+}
+
+.navigation__link:hover,
+.navigation__link:focus-visible,
+.navigation__dropdown-link:hover,
+.navigation__dropdown-link:focus-visible {
+  opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: 0.35em;
+}
+
+.navigation__item {
+  position: relative;
+}
+
+.navigation__dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 7.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--color-bg);
+  border: 1px solid var(--color-fg);
+  display: none;
+}
+
+.navigation__dropdown li + li {
+  border-top: 1px solid var(--color-fg);
+}
+
+.navigation__dropdown-link {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  text-align: left;
+  opacity: 1;
+}
+
+.navigation__item--dropdown:hover .navigation__dropdown,
+.navigation__item--dropdown:focus-within .navigation__dropdown,
+.navigation__item--dropdown.is-open .navigation__dropdown {
+  display: block;
+}
+
+@media (max-width: 720px) {
+  .navigation__inner {
+    align-items: flex-start;
+    padding-top: 14px;
+    height: auto;
+    min-height: var(--nav-height);
+  }
+
+  .navigation {
+    height: auto;
+  }
+}
+
+.navigation__item--home {
+  margin-right: auto;
+}
+
+.navigation__link--home {
+  letter-spacing: 0.08em;
+}
+
+.navigation__link.is-active {
+  opacity: 1;
+  border-bottom: 1px solid currentColor;
+}

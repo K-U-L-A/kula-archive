@@ -1,0 +1,31 @@
+.protocols {
+  padding: var(--space-section) var(--space-page);
+}
+
+.protocols__intro {
+  margin-bottom: calc(var(--space-section) * 0.65);
+}
+
+.protocols__docs {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space-section) * 0.55);
+  max-width: var(--measure-wide);
+}
+
+.protocol-doc__title {
+  margin: 0 0 1.25rem;
+  font-size: var(--text-sm);
+  font-weight: 400;
+  letter-spacing: var(--tracking-normal);
+}
+
+.protocol-doc__paragraph {
+  margin: 0 0 1rem;
+  font-size: var(--text-base);
+  line-height: var(--leading-loose);
+}
+
+.protocol-doc__paragraph:last-child {
+  margin-bottom: 0;
+}

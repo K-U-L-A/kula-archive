@@ -1,0 +1,8 @@
+.hero {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100svh;
+  padding: var(--space-page);
+  padding-top: calc(var(--nav-height) + var(--space-page));
+}

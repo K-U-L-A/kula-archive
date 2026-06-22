@@ -1,0 +1,34 @@
+.contact {
+  padding: var(--space-section) var(--space-page);
+}
+
+.contact__inner {
+  max-width: var(--measure);
+}
+
+.contact__lead {
+  margin: 0 0 2rem;
+  font-size: var(--text-md);
+  line-height: var(--leading-loose);
+}
+
+.contact__detail {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: var(--leading-loose);
+}
+
+.contact__detail--quiet {
+  margin-top: 1rem;
+  font-size: var(--text-sm);
+  opacity: 0.45;
+}
+
+.contact__label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  opacity: 0.45;
+}

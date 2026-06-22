@@ -1,0 +1,11 @@
+.footer {
+  padding: calc(var(--space-section) * 0.6) var(--space-page) calc(var(--space-section) * 0.8);
+}
+
+.footer__text {
+  margin: 0;
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  opacity: 0.35;
+}

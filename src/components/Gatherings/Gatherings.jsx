@@ -28,15 +28,14 @@ export default function Gatherings() {
   return (
     <section id="gatherings" className="archive section-anchor">
       <div className="archive__intro">
-        <h2 className="section-label">Gatherings</h2>
+        <h2 className="section-label">Gatherings | Programs</h2>
       </div>
 
       <div id="upcoming" className="archive__gathering section-anchor">
         <h3 className="archive__gathering-label">Upcoming</h3>
         {upcomingWorkshops.length === 0 ? (
           <p className="archive__empty">
-            Nothing scheduled yet.
-            <span className="ko">예정된 모임이 없습니다.</span>
+            ··· soon!
           </p>
         ) : (
           <ArchiveGrid workshops={upcomingWorkshops} onSelect={setSelectedId} />
@@ -47,8 +46,7 @@ export default function Gatherings() {
         <h3 className="archive__gathering-label">Past</h3>
         {pastWorkshops.length === 0 ? (
           <p className="archive__empty">
-            No gatherings recorded yet.
-            <span className="ko">기록된 모임이 없습니다.</span>
+            nothing yet···
           </p>
         ) : (
           <ArchiveGrid workshops={pastWorkshops} onSelect={setSelectedId} />

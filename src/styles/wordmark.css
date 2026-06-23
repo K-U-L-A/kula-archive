@@ -88,4 +88,5 @@
   image-rendering: pixelated;
   object-fit: cover;
   opacity: 0.75;
+  pointer-events: none;
 }

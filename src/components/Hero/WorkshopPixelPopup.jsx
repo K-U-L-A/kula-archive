@@ -4,7 +4,7 @@ import './WorkshopPixelPopup.css'
 const POPUP_W = 210
 const POPUP_H = 280
 
-export default function WorkshopPixelPopup({ workshop, position, onClose }) {
+export default function WorkshopPixelPopup({ workshop, position, onClose, onGoToArchive }) {
   const ref = useRef(null)
   const [isVisible, setIsVisible] = useState(false)
 
@@ -48,33 +48,45 @@ export default function WorkshopPixelPopup({ workshop, position, onClose }) {
         ×
       </button>
 
-      <div className="pixel-popup__img-col">
-        {workshop?.thumbnail ? (
-          <img src={workshop.thumbnail} alt="" />
-        ) : (
-          <div className="pixel-popup__img-placeholder" />
-        )}
-      </div>
-
-      <div className="pixel-popup__text-col">
-        {workshop ? (
-          <>
-            <p className="pixel-popup__title">{workshop.title}</p>
-            <p className="pixel-popup__detail">
-              {workshop.location} · {workshop.date}
+      {workshop ? (
+        <>
+          <div
+            className="pixel-popup__img-col"
+            style={{ cursor: 'pointer' }}
+            onClick={() => { onClose(); onGoToArchive(workshop.id) }}
+          >
+            {workshop.thumbnail ? (
+              <img src={workshop.thumbnail} alt="" />
+            ) : (
+              <div className="pixel-popup__img-placeholder" />
+            )}
+          </div>
+          <div className="pixel-popup__text-col">
+            <p
+              className="pixel-popup__title"
+              style={{ cursor: 'pointer' }}
+              onClick={() => { onClose(); onGoToArchive(workshop.id) }}
+            >
+              {workshop.title ?? workshop.url}
             </p>
-          </>
-        ) : (
-          <>
+            <p className="pixel-popup__detail">{workshop.type}</p>
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="pixel-popup__img-col">
+            <div className="pixel-popup__img-placeholder" />
+          </div>
+          <div className="pixel-popup__text-col">
             <p className="pixel-popup__empty-text">
-              Nothing has happened here yet.
+              Nothing has happened here yet...
             </p>
             <p className="pixel-popup__empty-text">
               Maybe you'll be part of it... <span className="pixel-popup__glyph">◌𓈒𖡼</span>
             </p>
-          </>
-        )}
-      </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }

@@ -1,8 +1,33 @@
 .hero {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  min-height: 100svh;
-  padding: var(--space-page);
-  padding-top: calc(var(--nav-height) + var(--space-page));
+  justify-content: center;
+  min-height: 100vh;
+  gap: 4rem;
+}
+
+.hero__join {
+  display: flex;
+  justify-content: center;
+}
+
+.hero__join-btn {
+  display: block;
+  margin: 2rem auto 0;
+  background: none;
+  border: 2px double #000;
+  padding: 12px 40px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: inherit;
+  outline: 1px solid #000;
+  outline-offset: -5px;
+}
+
+.hero__join-btn:hover {
+  background: #000;
+  color: #fff;
 }

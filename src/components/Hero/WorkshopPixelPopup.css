@@ -97,3 +97,22 @@
   display: inline-block;
   letter-spacing: 0.5px;
 }
+
+.pixel-popup__archive-btn {
+  background: none;
+  border: none;
+  border-top: 1px solid #000;
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  opacity: 0.5;
+}
+
+.pixel-popup__archive-btn:hover {
+  opacity: 1;
+}

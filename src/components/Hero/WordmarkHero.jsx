@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { getArchiveWorkshops } from '../../data/archive'
+import { supabase } from '../../lib/supabase'
+import { getArenaBlocks } from '../../lib/arena'
 import { getTileDepth, getWordmark } from '../../wordmark'
 import '../../styles/wordmark.css'
 import WorkshopPixelPopup from './WorkshopPixelPopup'
@@ -22,20 +23,6 @@ const TILE_MAGNET_DATA = WORDMARK.tiles.map(({ id, x, y, size }) => ({
   cx: x + size / 2,
   cy: y + size / 2,
 }))
-
-const pastWorkshops = getArchiveWorkshops().filter(
-  (w) => w.gathering === 'past' && w.thumbnail
-)
-
-const primaryLetterTiles = WORDMARK.tiles.filter(
-  (t) => t.kind === 'letter' && !t.id.includes('accent')
-)
-
-const TILE_WORKSHOP_MAP = new Map(
-  pastWorkshops
-    .map((workshop, i) => [primaryLetterTiles[i]?.id, workshop])
-    .filter(([id]) => id !== undefined)
-)
 
 function magneticMaxOffset(size) {
   const minSize = 36
@@ -276,24 +263,78 @@ function useWordmarkScale({ letterWidth, letterHeight, width, height }) {
   return scale
 }
 
-export default function WordmarkHero() {
+export default function WordmarkHero({ onGoToArchiveItem }) {
   const scale = useWordmarkScale(WORDMARK)
   const wordmarkRef = useRef(null)
   const registerTile = useMagneticFrames(scale, wordmarkRef)
   const [activeId, setActiveId] = useState(null)
   const [activeWorkshop, setActiveWorkshop] = useState(null)
   const [popupPos, setPopupPos] = useState({ x: 0, y: 0 })
+  const [submissions, setSubmissions] = useState([])
+
+  useEffect(() => {
+    async function loadSubmissions() {
+      const [supabaseRes, arenaBlocks] = await Promise.all([
+        supabase
+          .from('archive_submissions')
+          .select('*')
+          .eq('status', 'approved')
+          .order('created_at', { ascending: true }),
+        getArenaBlocks(),
+      ])
+
+      const supabaseItems = (supabaseRes.data ?? []).map((item) => ({
+        ...item,
+        source: 'supabase',
+      }))
+
+      const merged = [...supabaseItems, ...arenaBlocks].filter(
+        (item) => item.thumbnail
+      )
+
+      setSubmissions(merged)
+    }
+
+    loadSubmissions()
+  }, [])
+
+  const primaryLetterTiles = WORDMARK.tiles.filter(
+    (t) => t.kind === 'letter' && !t.id.includes('accent')
+  )
+
+  function seededShuffle(arr) {
+    const result = [...arr]
+    let seed = 42
+    function rand() {
+      seed = (seed * 1664525 + 1013904223) & 0xffffffff
+      return (seed >>> 0) / 0xffffffff
+    }
+    for (let i = result.length - 1; i > 0; i--) {
+      const j = Math.floor(rand() * (i + 1));
+      [result[i], result[j]] = [result[j], result[i]]
+    }
+    return result
+  }
+
+  const shuffledTiles = seededShuffle(primaryLetterTiles)
+
+  const tileSubmissionMap = new Map(
+    submissions
+      .map((submission, i) => [shuffledTiles[i]?.id, submission])
+      .filter(([id]) => id !== undefined)
+  )
+
   const stageWidth = WORDMARK.width * scale
   const stageHeight = WORDMARK.height * scale
 
   function handleTileClick(event, id) {
-    const workshop = TILE_WORKSHOP_MAP.get(id) ?? null
+    const submission = tileSubmissionMap.get(id) ?? null
     const rect = event.currentTarget.getBoundingClientRect()
     setPopupPos({
       x: rect.left + rect.width / 2,
       y: rect.top + rect.height / 2,
     })
-    setActiveWorkshop(workshop)
+    setActiveWorkshop(submission)
     setActiveId(id)
   }
 
@@ -319,7 +360,7 @@ export default function WordmarkHero() {
         >
           {WORDMARK.tiles.map(({ id, x, y, size, kind }) => {
             const depth = getTileDepth(size)
-            const workshop = TILE_WORKSHOP_MAP.get(id)
+            const submission = tileSubmissionMap.get(id)
 
             return (
               <button
@@ -329,25 +370,29 @@ export default function WordmarkHero() {
                 className={[
                   'pixel',
                   kind === 'debris' ? 'pixel--debris' : '',
-                  workshop ? 'pixel--workshop' : '',
+                  submission ? 'pixel--workshop' : '',
                 ]
                   .filter(Boolean)
                   .join(' ')}
-                aria-label={workshop ? workshop.title : `${kind} pixel ${id}`}
+                aria-label={submission ? (submission.title ?? submission.url) : `${kind} pixel ${id}`}
                 style={{
                   left: x,
                   top: y,
                   width: size,
                   height: size,
-                  zIndex: Math.round(y + x),
+                  zIndex: submission
+                    ? 9000 + (submissions.length - submissions.findIndex(s => s.id === submission.id))
+                    : Math.round(y + x),
                   '--depth': `${depth}px`,
+                  pointerEvents: 'auto',
+                  cursor: tileSubmissionMap.get(id) ? 'pointer' : 'default',
                 }}
                 onClick={(e) => handleTileClick(e, id)}
               >
-                {workshop && (
+                {submission?.thumbnail && (
                   <div className="pixel__thumb-wrap">
                     <img
-                      src={workshop.thumbnail}
+                      src={submission.thumbnail}
                       alt=""
                       className="pixel__thumb-img"
                       draggable={false}
@@ -368,6 +413,7 @@ export default function WordmarkHero() {
             setActiveId(null)
             setActiveWorkshop(null)
           }}
+          onGoToArchive={onGoToArchiveItem}
         />
       )}
     </>

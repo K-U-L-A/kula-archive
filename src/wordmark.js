@@ -93,15 +93,15 @@ const MASTER_LETTERS = {
 const MANDATORY_FIELD_ZONES = [
   { id: 'zone-01-top-far-left', nx: -0.13, ny: -0.4, profile: 'mixed-six', density: 'normal' },
   { id: 'zone-02-top-k-u', nx: 0.19, ny: -0.36, profile: 'large-two-small', density: 'normal' },
-  { id: 'zone-03-top-u', nx: 0.38, ny: -0.4, profile: 'seven-curated', density: 'dense' },
+  { id: 'zone-03-top-u', nx: 0.38, ny: -0.4, profile: 'seven-curated', density: 'wide' },
   { id: 'zone-04-top-u-l', nx: 0.52, ny: -0.35, profile: 'medium-triple', density: 'normal' },
   { id: 'zone-05-top-far-right', nx: 0.95, ny: -0.32, profile: 'mixed-five', density: 'normal' },
   { id: 'zone-06-right-a', nx: 1.05, ny: 0.14, profile: 'hero-cluster', density: 'normal' },
-  { id: 'zone-07-between-l-a', nx: 0.7, ny: 0.5, profile: 'seven-curated', density: 'dense' },
+  { id: 'zone-07-between-l-a', nx: 0.7, ny: 0.5, profile: 'seven-curated', density: 'wide' },
   { id: 'zone-08-left-k', nx: -0.09, ny: 0.44, profile: 'medium-triple', density: 'sparse' },
-  { id: 'zone-09-below-k', nx: 0.06, ny: 1.2, profile: 'mixed-five', density: 'dense' },
+  { id: 'zone-09-below-k', nx: 0.06, ny: 1.2, profile: 'mixed-five', density: 'wide' },
   { id: 'zone-10-below-u', nx: 0.37, ny: 1.22, profile: 'medium-triple', density: 'normal' },
-  { id: 'zone-11-below-a', nx: 0.86, ny: 1.26, profile: 'seven-curated', density: 'dense' },
+  { id: 'zone-11-below-a', nx: 0.86, ny: 1.26, profile: 'seven-curated', density: 'wide' },
   { id: 'zone-12-corner-br', nx: 1.12, ny: 1.24, profile: 'breakaway-large', density: 'sparse' },
 ]
 
@@ -172,15 +172,13 @@ function hash(seed) {
 function pickFrameScale(seed) {
   const roll = hash(seed)
 
-  if (roll < 0.1) return MODULE_SCALE.TINY
-  if (roll < 0.22) return 0.74
-  if (roll < 0.36) return MODULE_SCALE.SMALL
-  if (roll < 0.48) return 0.91
-  if (roll < 0.62) return MODULE_SCALE.MEDIUM
-  if (roll < 0.74) return 1.12
-  if (roll < 0.84) return MODULE_SCALE.LARGE
-  if (roll < 0.93) return MODULE_SCALE.EXTRA_LARGE
-  if (roll < 0.98) return 1.88
+  if (roll < 0.1) return MODULE_SCALE.SMALL
+  if (roll < 0.25) return 0.91
+  if (roll < 0.45) return MODULE_SCALE.MEDIUM
+  if (roll < 0.62) return 1.12
+  if (roll < 0.76) return MODULE_SCALE.LARGE
+  if (roll < 0.88) return MODULE_SCALE.EXTRA_LARGE
+  if (roll < 0.95) return 1.88
   return MODULE_SCALE.HERO
 }
 
@@ -370,7 +368,7 @@ function addLetterTiles(tiles, shape, offsetCol, letter) {
         seed,
         sizePicker: pickLetterTileSize,
         jitter: true,
-        jitterScale: 0.58,
+        jitterScale: 0.1,
       })
 
       if (hash(seed + 401) > 0.8) return
@@ -664,7 +662,7 @@ function placeMandatoryFrame(
         x,
         y,
         size,
-        allowDebrisOverlap: true,
+        allowDebrisOverlap: false,
       })
     ) {
       return true
@@ -685,7 +683,7 @@ function placeMandatoryFrame(
     x: nudged.x,
     y: nudged.y,
     size,
-    allowDebrisOverlap: true,
+    allowDebrisOverlap: false,
   })
 
   return true

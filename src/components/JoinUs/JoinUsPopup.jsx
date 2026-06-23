@@ -18,11 +18,30 @@ export default function JoinUsPopup({ onClose }) {
     function onMouseUp() {
       dragging.current = false
     }
+    function onTouchMove(e) {
+      if (!dragging.current) return
+      e.preventDefault()
+      const touch = e.touches[0]
+      if (!touch) return
+      setPos({
+        x: touch.clientX - offset.current.x,
+        y: touch.clientY - offset.current.y,
+      })
+    }
+    function onTouchEnd() {
+      dragging.current = false
+    }
     window.addEventListener('mousemove', onMouseMove)
     window.addEventListener('mouseup', onMouseUp)
+    window.addEventListener('touchmove', onTouchMove, { passive: false })
+    window.addEventListener('touchend', onTouchEnd)
+    window.addEventListener('touchcancel', onTouchEnd)
     return () => {
       window.removeEventListener('mousemove', onMouseMove)
       window.removeEventListener('mouseup', onMouseUp)
+      window.removeEventListener('touchmove', onTouchMove)
+      window.removeEventListener('touchend', onTouchEnd)
+      window.removeEventListener('touchcancel', onTouchEnd)
     }
   }, [])
 
@@ -35,12 +54,24 @@ export default function JoinUsPopup({ onClose }) {
     }
   }
 
+  function onTouchStart(e) {
+    if (e.target.closest('button')) return
+    const touch = e.touches[0]
+    if (!touch) return
+    dragging.current = true
+    offset.current = {
+      x: touch.clientX - pos.x,
+      y: touch.clientY - pos.y,
+    }
+  }
+
   return (
     <div
       ref={ref}
       className="joinus-chip"
       style={{ left: pos.x, top: pos.y }}
       onMouseDown={onMouseDown}
+      onTouchStart={onTouchStart}
     >
       <button type="button" className="joinus-chip__close" onClick={onClose}>×</button>
       <p className="joinus-chip__title">Channels</p>

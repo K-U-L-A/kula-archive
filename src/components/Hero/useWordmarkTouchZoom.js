@@ -99,25 +99,38 @@ export default function useWordmarkTouchZoom({
       }
     }
 
+    function getPanBounds(pinchScale) {
+      const parent = stageEl.parentElement
+      if (!parent) {
+        return { minX: 0, maxX: 0, minY: 0, maxY: 0 }
+      }
+
+      const { width, height } = visualSize(pinchScale)
+      const parentRect = parent.getBoundingClientRect()
+      const stageRect = stageEl.getBoundingClientRect()
+      const stageLeft = stageRect.left - parentRect.left
+      const stageTop = stageRect.top - parentRect.top
+      const parentWidth = parent.clientWidth
+      const parentHeight = parent.clientHeight
+
+      return {
+        minX: parentWidth - stageLeft - width,
+        maxX: -stageLeft,
+        minY: parentHeight - stageTop - height,
+        maxY: -stageTop,
+      }
+    }
+
     function clampPan(x, y, pinchScale) {
       if (pinchScale <= 1) {
         return { x: 0, y: 0 }
       }
 
-      const parent = stageEl.parentElement
-      if (!parent) {
-        return { x: 0, y: 0 }
-      }
-
-      const { width, height } = visualSize(pinchScale)
-      const viewportWidth = parent.clientWidth
-      const viewportHeight = parent.clientHeight
-      const maxX = Math.max(0, (width - viewportWidth) / 2)
-      const maxY = Math.max(0, (height - viewportHeight) / 2)
+      const { minX, maxX, minY, maxY } = getPanBounds(pinchScale)
 
       return {
-        x: clamp(x, -maxX, maxX),
-        y: clamp(y, -maxY, maxY),
+        x: minX > maxX ? (minX + maxX) / 2 : clamp(x, minX, maxX),
+        y: minY > maxY ? (minY + maxY) / 2 : clamp(y, minY, maxY),
       }
     }
 

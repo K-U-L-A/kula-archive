@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { getArenaBlocks } from '../../lib/arena'
 import { getTileDepth, getWordmark } from '../../wordmark'
 import '../../styles/wordmark.css'
+import useWordmarkTouchZoom from './useWordmarkTouchZoom'
 import WorkshopPixelPopup from './WorkshopPixelPopup'
 
 const WORDMARK = getWordmark('KULA')
@@ -269,7 +270,34 @@ function useWordmarkScale({ letterWidth, letterHeight, width, height }) {
 
 export default function WordmarkHero({ onGoToArchiveItem }) {
   const scale = useWordmarkScale(WORDMARK)
+  const stageRef = useRef(null)
   const wordmarkRef = useRef(null)
+  const baseScaleRef = useRef(scale)
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined'
+      ? window.matchMedia('(max-width: 768px)').matches
+      : false,
+  )
+
+  baseScaleRef.current = scale
+
+  const getBaseScale = useCallback(() => baseScaleRef.current, [])
+
+  useWordmarkTouchZoom({
+    stageRef,
+    wordmarkRef,
+    getBaseScale,
+    layoutScale: scale,
+  })
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 768px)')
+    const update = () => setIsMobile(media.matches)
+    update()
+    media.addEventListener('change', update)
+    return () => media.removeEventListener('change', update)
+  }, [])
+
   const registerTile = useMagneticFrames(scale, wordmarkRef)
   const [activeId, setActiveId] = useState(null)
   const [activeWorkshop, setActiveWorkshop] = useState(null)
@@ -345,6 +373,7 @@ export default function WordmarkHero({ onGoToArchiveItem }) {
   return (
     <>
       <div
+        ref={stageRef}
         className="wordmark-stage"
         style={{
           width: stageWidth,
@@ -359,7 +388,7 @@ export default function WordmarkHero({ onGoToArchiveItem }) {
           style={{
             width: WORDMARK.width,
             height: WORDMARK.height,
-            transform: `scale(${scale})`,
+            ...(isMobile ? {} : { transform: `scale(${scale})` }),
           }}
         >
             {WORDMARK.tiles.map(({ id, x, y, size, kind }) => {

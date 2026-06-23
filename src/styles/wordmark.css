@@ -90,3 +90,14 @@
   opacity: 0.75;
   pointer-events: none;
 }
+
+@media (max-width: 768px) {
+  .wordmark-stage {
+    touch-action: none;
+  }
+
+  .wordmark-stage.is-gesturing .wordmark {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+}

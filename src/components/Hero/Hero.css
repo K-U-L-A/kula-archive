@@ -19,7 +19,6 @@
   flex-direction: column;
   align-items: center;
   gap: 4rem;
-  touch-action: none;
   overflow: visible;
 }
 
@@ -82,6 +81,13 @@
     width: 100%;
     overflow: visible;
     padding: clamp(1.5rem, 6vh, 3rem) clamp(0.75rem, 4vw, 1.25rem);
+    touch-action: none;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+
+  .hero__zoom-body.is-gesturing {
+    will-change: transform;
   }
 
   .hero__join-btn {

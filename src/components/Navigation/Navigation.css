@@ -90,15 +90,16 @@
 }
 
 @media (max-width: 720px) {
+  .navigation {
+    height: auto;
+    transform: translateZ(0);
+  }
+
   .navigation__inner {
     align-items: flex-start;
     padding-top: 14px;
     height: auto;
     min-height: var(--nav-height);
-  }
-
-  .navigation {
-    height: auto;
   }
 }
 

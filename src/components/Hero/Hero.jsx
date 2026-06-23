@@ -4,22 +4,14 @@ import useWordmarkTouchZoom from './useWordmarkTouchZoom'
 import './Hero.css'
 
 export default function Hero({ onGoToArchiveItem, onJoinUs }) {
-  const zoomRef = useRef(null)
-  const { zoom, easeRelease } = useWordmarkTouchZoom(zoomRef)
+  const zoomBodyRef = useRef(null)
+  useWordmarkTouchZoom(zoomBodyRef)
 
   return (
     <section className="hero section-anchor" aria-label="KULA">
       <div className="hero__content">
-        <div
-          ref={zoomRef}
-          className="hero__zoom"
-          style={{
-            transform: `translate(${zoom.x}px, ${zoom.y}px) scale(${zoom.scale})`,
-            transformOrigin: 'center center',
-            transition: easeRelease ? 'transform 0.15s ease-out' : 'none',
-          }}
-        >
-          <div className="hero__zoom-body">
+        <div className="hero__zoom">
+          <div ref={zoomBodyRef} className="hero__zoom-body">
             <WordmarkHero onGoToArchiveItem={onGoToArchiveItem} />
           </div>
           <button

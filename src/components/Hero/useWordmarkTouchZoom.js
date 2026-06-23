@@ -48,6 +48,8 @@ export default function useWordmarkTouchZoom({
       mode: 'idle',
       initialDistance: 0,
       startScale: 1,
+      focalContentX: 0,
+      focalContentY: 0,
       panAnchorX: 0,
       panAnchorY: 0,
       panOriginX: 0,
@@ -56,6 +58,34 @@ export default function useWordmarkTouchZoom({
     }
 
     const viewportMeta = document.querySelector('meta[name="viewport"]')
+
+    function getStageOrigin() {
+      const rect = stageEl.getBoundingClientRect()
+      return { left: rect.left, top: rect.top }
+    }
+
+    function clientMidpoint(touches) {
+      return {
+        x: (touches[0].clientX + touches[1].clientX) / 2,
+        y: (touches[0].clientY + touches[1].clientY) / 2,
+      }
+    }
+
+    function contentPointFromClient(clientX, clientY, panX, panY, totalScale) {
+      const origin = getStageOrigin()
+      return {
+        x: (clientX - origin.left - panX) / totalScale,
+        y: (clientY - origin.top - panY) / totalScale,
+      }
+    }
+
+    function panFromFocalPoint(focalX, focalY, clientX, clientY, totalScale) {
+      const origin = getStageOrigin()
+      return {
+        x: clientX - origin.left - focalX * totalScale,
+        y: clientY - origin.top - focalY * totalScale,
+      }
+    }
 
     function visualSize(pinchScale) {
       const base = getBaseScale()
@@ -86,8 +116,8 @@ export default function useWordmarkTouchZoom({
       const maxY = Math.max(0, (height - viewportHeight) / 2)
 
       return {
-        x: clamp(Math.round(x), -maxX, maxX),
-        y: clamp(Math.round(y), -maxY, maxY),
+        x: clamp(x, -maxX, maxX),
+        y: clamp(y, -maxY, maxY),
       }
     }
 
@@ -123,6 +153,18 @@ export default function useWordmarkTouchZoom({
         gesture.mode = 'pinch'
         gesture.initialDistance = touchDistance(event.touches)
         gesture.startScale = viewRef.current.scale
+
+        const mid = clientMidpoint(event.touches)
+        const totalScale = getBaseScale() * viewRef.current.scale
+        const focal = contentPointFromClient(
+          mid.x,
+          mid.y,
+          viewRef.current.x,
+          viewRef.current.y,
+          totalScale,
+        )
+        gesture.focalContentX = focal.x
+        gesture.focalContentY = focal.y
         return
       }
 
@@ -159,10 +201,17 @@ export default function useWordmarkTouchZoom({
           (touchDistance(event.touches) / gesture.initialDistance) *
           gesture.startScale
         const nextScale = clamp(rawScale, MIN_PINCH_SCALE, MAX_PINCH_SCALE)
-        scheduleApply(
-          { scale: nextScale, x: viewRef.current.x, y: viewRef.current.y },
-          false,
+        const totalScale = getBaseScale() * nextScale
+        const mid = clientMidpoint(event.touches)
+        const pan = panFromFocalPoint(
+          gesture.focalContentX,
+          gesture.focalContentY,
+          mid.x,
+          mid.y,
+          totalScale,
         )
+
+        scheduleApply({ scale: nextScale, ...pan }, false)
         return
       }
 

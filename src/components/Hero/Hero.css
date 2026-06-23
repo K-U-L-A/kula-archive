@@ -11,7 +11,20 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow: visible;
+}
+
+.hero__zoom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 4rem;
+  touch-action: none;
+  overflow: visible;
+}
+
+.hero__zoom-body {
+  overflow: visible;
 }
 
 .hero__join {
@@ -42,22 +55,41 @@
 @media (max-width: 768px) {
   .hero {
     justify-content: flex-start;
-    padding-top: clamp(4rem, 13vh, 5.5rem);
+    min-height: 100dvh;
+    overflow: visible;
+    padding-top: 0;
   }
 
   .hero__content {
     flex: 1;
     width: 100%;
-    min-height: calc(100dvh - clamp(4rem, 13vh, 5.5rem) - 1rem);
+    min-height: calc(100dvh - var(--nav-height, 52px));
     justify-content: flex-start;
-    gap: 1.25rem;
+    overflow: visible;
+  }
+
+  .hero__zoom {
+    flex: 1;
+    width: 100%;
+    gap: 0;
+  }
+
+  .hero__zoom-body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    overflow: visible;
+    padding: clamp(1.5rem, 6vh, 3rem) clamp(0.75rem, 4vw, 1.25rem);
   }
 
   .hero__join-btn {
     box-sizing: border-box;
     width: auto;
     max-width: 200px;
-    margin-top: auto;
+    flex-shrink: 0;
+    margin-top: 0;
     margin-bottom: clamp(2rem, 9vh, 3.5rem);
     margin-left: auto;
     margin-right: auto;

@@ -17,10 +17,6 @@ const MAGNET_LERP = 0.1
 const MAGNET_RETURN_LERP = 0.075
 const MAGNET_SETTLE_EPSILON = 0.04
 
-const MIN_PINCH_SCALE = 1
-const MAX_PINCH_SCALE = 4
-const DOUBLE_TAP_MS = 300
-
 const TILE_MAGNET_DATA = WORDMARK.tiles.map(({ id, x, y, size }) => ({
   id,
   size,
@@ -246,15 +242,19 @@ function useWordmarkScale({ letterWidth, letterHeight, width, height }) {
 
     function updateScale() {
       const navHeight = readNavHeight()
-      const availableWidth = window.innerWidth - PAGE_PADDING * 2
-      const availableHeight = window.innerHeight - PAGE_PADDING * 2 - navHeight
+      const isMobile = window.innerWidth <= 768
+      const pagePadding = isMobile ? 20 : PAGE_PADDING
+      const heroFill = isMobile ? 0.92 : HERO_FILL
+      const compositionMargin = isMobile ? 0.98 : COMPOSITION_MARGIN
+      const availableWidth = window.innerWidth - pagePadding * 2
+      const availableHeight = window.innerHeight - pagePadding * 2 - navHeight
 
       setScale(
         Math.min(
-          (availableWidth * HERO_FILL) / letterWidth,
-          (availableWidth * COMPOSITION_MARGIN) / width,
-          (availableHeight * HERO_FILL) / letterHeight,
-          (availableHeight * COMPOSITION_MARGIN) / height,
+          (availableWidth * heroFill) / letterWidth,
+          (availableWidth * compositionMargin) / width,
+          (availableHeight * heroFill) / letterHeight,
+          (availableHeight * compositionMargin) / height,
         ),
       )
     }
@@ -270,87 +270,11 @@ function useWordmarkScale({ letterWidth, letterHeight, width, height }) {
 export default function WordmarkHero({ onGoToArchiveItem }) {
   const scale = useWordmarkScale(WORDMARK)
   const wordmarkRef = useRef(null)
-  const wrapperRef = useRef(null)
-  const [pinchScale, setPinchScale] = useState(1)
-  const pinchScaleRef = useRef(1)
   const registerTile = useMagneticFrames(scale, wordmarkRef)
   const [activeId, setActiveId] = useState(null)
   const [activeWorkshop, setActiveWorkshop] = useState(null)
   const [popupPos, setPopupPos] = useState({ x: 0, y: 0 })
   const [submissions, setSubmissions] = useState([])
-
-  pinchScaleRef.current = pinchScale
-
-  useEffect(() => {
-    const el = wrapperRef.current
-    if (!el) return undefined
-
-    const gesture = {
-      initialDistance: 0,
-      startScale: 1,
-      lastTapTime: 0,
-    }
-
-    function touchDistance(touches) {
-      return Math.hypot(
-        touches[0].clientX - touches[1].clientX,
-        touches[0].clientY - touches[1].clientY,
-      )
-    }
-
-    function onTouchStart(event) {
-      if (event.touches.length === 2) {
-        event.preventDefault()
-        gesture.initialDistance = touchDistance(event.touches)
-        gesture.startScale = pinchScaleRef.current
-        return
-      }
-
-      if (event.touches.length === 1) {
-        const now = Date.now()
-        if (now - gesture.lastTapTime < DOUBLE_TAP_MS) {
-          setPinchScale(1)
-          gesture.lastTapTime = 0
-        } else {
-          gesture.lastTapTime = now
-        }
-      }
-    }
-
-    function onTouchMove(event) {
-      if (event.touches.length !== 2) return
-
-      event.preventDefault()
-
-      if (gesture.initialDistance <= 0) return
-
-      const nextScale =
-        (touchDistance(event.touches) / gesture.initialDistance) *
-        gesture.startScale
-
-      setPinchScale(
-        Math.min(MAX_PINCH_SCALE, Math.max(MIN_PINCH_SCALE, nextScale)),
-      )
-    }
-
-    function onTouchEnd(event) {
-      if (event.touches.length < 2) {
-        gesture.initialDistance = 0
-      }
-    }
-
-    el.addEventListener('touchstart', onTouchStart, { passive: false })
-    el.addEventListener('touchmove', onTouchMove, { passive: false })
-    el.addEventListener('touchend', onTouchEnd, { passive: false })
-    el.addEventListener('touchcancel', onTouchEnd, { passive: false })
-
-    return () => {
-      el.removeEventListener('touchstart', onTouchStart)
-      el.removeEventListener('touchmove', onTouchMove)
-      el.removeEventListener('touchend', onTouchEnd)
-      el.removeEventListener('touchcancel', onTouchEnd)
-    }
-  }, [])
 
   useEffect(() => {
     async function loadSubmissions() {
@@ -421,19 +345,12 @@ export default function WordmarkHero({ onGoToArchiveItem }) {
   return (
     <>
       <div
-        ref={wrapperRef}
+        className="wordmark-stage"
         style={{
-          transform: `scale(${pinchScale})`,
-          transformOrigin: 'center center',
+          width: stageWidth,
+          height: stageHeight,
         }}
       >
-        <div
-          className="wordmark-stage"
-          style={{
-            width: stageWidth,
-            height: stageHeight,
-          }}
-        >
         <div
           ref={wordmarkRef}
           className="wordmark"
@@ -445,52 +362,51 @@ export default function WordmarkHero({ onGoToArchiveItem }) {
             transform: `scale(${scale})`,
           }}
         >
-          {WORDMARK.tiles.map(({ id, x, y, size, kind }) => {
-            const depth = getTileDepth(size)
-            const submission = tileSubmissionMap.get(id)
+            {WORDMARK.tiles.map(({ id, x, y, size, kind }) => {
+              const depth = getTileDepth(size)
+              const submission = tileSubmissionMap.get(id)
 
-            return (
-              <button
-                key={id}
-                ref={registerTile(id)}
-                type="button"
-                className={[
-                  'pixel',
-                  kind === 'debris' ? 'pixel--debris' : '',
-                  submission ? 'pixel--workshop' : '',
-                ]
-                  .filter(Boolean)
-                  .join(' ')}
-                aria-label={submission ? (submission.title ?? submission.url) : `${kind} pixel ${id}`}
-                style={{
-                  left: x,
-                  top: y,
-                  width: size,
-                  height: size,
-                  zIndex: submission
-                    ? 9000 + (submissions.length - submissions.findIndex(s => s.id === submission.id))
-                    : Math.round(y + x),
-                  '--depth': `${depth}px`,
-                  pointerEvents: 'auto',
-                  cursor: tileSubmissionMap.get(id) ? 'pointer' : 'default',
-                }}
-                onClick={(e) => handleTileClick(e, id)}
-              >
-                {submission?.thumbnail && (
-                  <div className="pixel__thumb-wrap">
-                    <img
-                      src={submission.thumbnail}
-                      alt=""
-                      className="pixel__thumb-img"
-                      draggable={false}
-                    />
-                  </div>
-                )}
-              </button>
-            )
-          })}
+              return (
+                <button
+                  key={id}
+                  ref={registerTile(id)}
+                  type="button"
+                  className={[
+                    'pixel',
+                    kind === 'debris' ? 'pixel--debris' : '',
+                    submission ? 'pixel--workshop' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                  aria-label={submission ? (submission.title ?? submission.url) : `${kind} pixel ${id}`}
+                  style={{
+                    left: x,
+                    top: y,
+                    width: size,
+                    height: size,
+                    zIndex: submission
+                      ? 9000 + (submissions.length - submissions.findIndex(s => s.id === submission.id))
+                      : Math.round(y + x),
+                    '--depth': `${depth}px`,
+                    pointerEvents: 'auto',
+                    cursor: tileSubmissionMap.get(id) ? 'pointer' : 'default',
+                  }}
+                  onClick={(e) => handleTileClick(e, id)}
+                >
+                  {submission?.thumbnail && (
+                    <div className="pixel__thumb-wrap">
+                      <img
+                        src={submission.thumbnail}
+                        alt=""
+                        className="pixel__thumb-img"
+                        draggable={false}
+                      />
+                    </div>
+                  )}
+                </button>
+              )
+            })}
         </div>
-      </div>
       </div>
 
       {activeId !== null && (
